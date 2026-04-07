@@ -7,5 +7,8 @@ class Dijkstra():
         self.n = len(maze)
         
     def run(self, start, end):
+        dist = { }
+        dist[start] = 0
+        
         
     

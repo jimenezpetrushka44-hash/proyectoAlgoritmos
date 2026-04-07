@@ -53,13 +53,11 @@ class Dijkstra():
 #Haciendo testing con un maze q me dio chatgpt
 def main():
     maze = [
-    [1,1,1,1,1,1,1],
-    [1,0,0,0,1,0,1],
-    [1,0,1,0,1,0,1],
-    [1,0,1,0,0,0,1],
-    [1,0,1,1,1,0,1],
-    [1,0,0,0,0,0,1],
-    [1,1,1,1,1,1,1]
+    [0,1,0,0,0],
+    [0,1,0,1,0],
+    [0,0,0,1,0],
+    [1,1,0,0,0],
+    [0,0,0,1,0]
 ]
 
     user_input = input("Quieres ver a dijkstra jeje?: ")
@@ -67,8 +65,8 @@ def main():
     if user_input.capitalize() == "Yes":
         
         obj_maze = Dijkstra(maze)
-        start = (1,1)
-        end= (len(maze)-2, len(maze)-2)
+        start = (0,0)
+        end= (4,4)
         
         path = obj_maze.run(start,end)
         

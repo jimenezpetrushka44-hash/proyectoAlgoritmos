@@ -38,6 +38,7 @@ class Dijkstra():
                         prev[(nx,ny)] = (x,y)
                         heapq.heappush(priority_queue, (new_dist, (nx,ny)))
                     
+        #Para retornar el path
         path = [ ]
         node = end
         if end not in prev:
@@ -49,6 +50,7 @@ class Dijkstra():
         path.reverse()
         return path
     
+#Haciendo testing con un maze q me dio chatgpt
 def main():
     maze = [
     [1,1,1,1,1,1,1],
@@ -60,7 +62,7 @@ def main():
     [1,1,1,1,1,1,1]
 ]
 
-    user_input = input("Would you like to see the algorithm?: ")
+    user_input = input("Quieres ver a dijkstra jeje?: ")
         
     if user_input.capitalize() == "Yes":
         

@@ -66,7 +66,7 @@ def main():
         
         obj_maze = Dijkstra(maze)
         start = (0,0)
-        end= (4,4)
+        end= (4,2)
         
         path = obj_maze.run(start,end)
         

@@ -8,7 +8,8 @@ class Dijkstra():
         
     def run(self, start, end):
         dist = { }
-        dist[start] = 0
-        
+        dist[start] = 0 
+        prev = { }
+        priority_queue = [(0, start)]
         
     

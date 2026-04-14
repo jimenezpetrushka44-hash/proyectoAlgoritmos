@@ -11,6 +11,7 @@ height = 600
 n = 51
 cell = width // n
 btn_start = pygame.Rect(200, 330, 200, 50)
+btn_retry = pygame.Rect(20, 550, 150, 40)
 
 #paleta de colores para que se vea bonito
 
@@ -133,16 +134,25 @@ while running:
         elif estado == "algoritmo":
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                x,y = pygame.mouse.get_pos()
-                i, j = y//cell, x // cell
-                
-                if 0 <= i < n and 0 <= j < n:
-                    if maze[i][j] == 0:
-                        if start is None:
-                            start = (i,j)
-                        elif end is None:
-                            end =(i,j)
-                            algo = dijkstra(maze, start, end)
+                if btn_retry.collidepoint(pygame.mouse.get_pos()):
+                    maze = np.ones((n,n))
+                    generar(1,1)
+                    start = None
+                    end = None
+                    visited = set()
+                    path = None
+                    algo = None
+                else:
+                    x,y = pygame.mouse.get_pos()
+                    i, j = y//cell, x // cell
+                    
+                    if 0 <= i < n and 0 <= j < n:
+                        if maze[i][j] == 0:
+                            if start is None:
+                                start = (i,j)
+                            elif end is None:
+                                end =(i,j)
+                                algo = dijkstra(maze, start, end)
 
     if algo:
         try:
@@ -157,10 +167,10 @@ while running:
 
         screen.fill((20,30,80))
 
-        title = font_title.render("LOGIN", True, (255,255,255))
-        screen.blit(title, (240,150))
+        title = font_title.render("ALGORITMO DIJKSTRA", True, (255,255,255))
+        screen.blit(title, (120,150))
 
-        sub = font_small.render("Welcome", True, (200,200,255))
+        sub = font_small.render("Bienvenid@", True, (200,200,255))
         screen.blit(sub, (250,190))
 
         input_box = pygame.Rect(150, 250, 300, 50)
@@ -201,6 +211,10 @@ while running:
             pygame.draw.rect(screen, start_color, (start[1]*cell, start[0]*cell, cell,cell))
         if end:
             pygame.draw.rect(screen, end_color, (end[1]*cell, end[0]*cell, cell, cell))
+
+        pygame.draw.rect(screen, (255,105,180), btn_retry, border_radius=10)
+        txt_retry = font_small.render("TRY AGAIN", True, (255,255,255))
+        screen.blit(txt_retry, (30, 560))
                     
     pygame.display.flip()
     clock.tick(60)

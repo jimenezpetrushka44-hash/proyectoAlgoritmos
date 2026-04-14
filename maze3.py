@@ -58,7 +58,17 @@ def dijkstra(maze, start, end):
                     prev[(nx,ny)] = (x,y)
                     heapq.heappush(pq, (new_d, (nx,ny)))
 
-    
+#Reconstruyendo el path:
+path = []
+cur = end 
+while cur in prev:
+    path.append(cur)
+    cur = prev[cur]
+path.append(start)
+path.reverse()
+
+yield visited, path
+ 
 running = True
 
 while running:

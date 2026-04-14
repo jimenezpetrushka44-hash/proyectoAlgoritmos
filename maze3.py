@@ -32,10 +32,8 @@ def generar(x,y):
             generar(nx, ny)
 generar(1,1)
 
-#Click del usuario (start y end en el maze)
 
-start = None
-end = None
+    
 
 #Funcion para dijkstra:
 def dijkstra(maze, start, end):
@@ -81,18 +79,44 @@ def reconstruir(prev, start, end):
  
 running = True
 
+#Click del usuario (start y end en el maze)
+
+start = None
+end = None
+
 while running:
     for event in pygame.event.get():
+        
+
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            x,y = pygame.mouse.get_pos()
+            i, j = y//cell, x // cell
+            
+            if maze[i][j] == 0:
+                if not start:
+                    start = (i,j)
+                elif not end:
+                    end =(i,j)
+            
         if event.type == pygame.QUIT:
             running = False
             
     screen.fill((0,0,0))
+    
+    #Aqui dibujo el maze:
     for i in range(n):
         for j in range(n):
             color = (255, 255,255)
             if maze[i][j] == 0:
                 color = (0,0,0)
-                pygame.draw.rect(screen, color, (j*cell, i*cell, cell, cell))
+            pygame.draw.rect(screen, color, (j*cell, i*cell, cell, cell))
+            if start:
+                pygame.draw.rect(screen, (0,255,0), (start[1]*cell, start[0]*cell, cell,cell))
+            if end:
+                pygame.draw.rect(screen, (225,255,0), (end[1]*cell, end[0]*cell, cell, cell))
+                    
     pygame.display.flip()
+    
 pygame.quit()
 

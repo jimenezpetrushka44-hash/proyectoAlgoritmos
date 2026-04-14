@@ -32,12 +32,17 @@ def generar(x,y):
             generar(nx, ny)
 generar(1,1)
 
+#Click del usuario (start y end en el maze)
+
+start = None
+end = None
+
 #Funcion para dijkstra:
 def dijkstra(maze, start, end):
     n=len(maze)
     pq=[(0, start)]
     dist = {start:0}
-    prev = {}
+    prev = { }
     visited = set()
     
     while pq:
@@ -57,17 +62,22 @@ def dijkstra(maze, start, end):
                     dist[(nx,ny)] = new_d
                     prev[(nx,ny)] = (x,y)
                     heapq.heappush(pq, (new_d, (nx,ny)))
+                    
+    return prev                
+    
 
 #Reconstruyendo el path:
-path = []
-cur = end 
-while cur in prev:
-    path.append(cur)
-    cur = prev[cur]
-path.append(start)
-path.reverse()
+def reconstruir(prev, start, end):
+    path = []
+    cur = end 
+    while cur in prev:
+        path.append(cur)
+        cur = prev[cur]
+    path.append(start)
+    path.reverse()
+    
+    return path
 
-yield visited, path
  
 running = True
 

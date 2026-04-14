@@ -113,55 +113,37 @@ clock = pygame.time.Clock()
 while running:
     for event in pygame.event.get():
         
+        if event.type == pygame.QUIT:
+            running = False
+
         if estado == "menu":
-            
-            screen.fill((20,30,80))
-
-            title = font_title.render("LOGIN", True, (255,255,255))
-            screen.blit(title, (240,150))
-
-            sub = font_small.render("Welcome", True, (200,200,255))
-            screen.blit(sub, (250,190))
-
-            input_box = pygame.Rect(150, 250, 300, 50)
-            pygame.draw.rect(screen, (255,255,255), input_box, border_radius=15)
-
-            text = font_small.render(nombre, True, (0,0,0))
-            screen.blit(text, (160, 265))
-
-            pygame.draw.rect(screen, (255,105,180), btn_start, border_radius=20)
-
-            txt_btn = font_small.render("START MAZE", True, (255,255,255))
-            screen.blit(txt_btn, (225, 345))
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE:
                     nombre = nombre[:-1]
                 elif event.key == pygame.K_RETURN:
-                    estado = "game"
-            else:
-                nombre += event.unicode
+                    estado = "algoritmo"
+                else:
+                    nombre += event.unicode
 
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if btn_start.collidepoint(pygame.mouse.get_pos()):
-                estado = "algoritmo"
-        
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            x,y = pygame.mouse.get_pos()
-            i, j = y//cell, x // cell
-            
-            if 0 <= i < n and 0 <= j < n:
-                if maze[i][j] == 0:
-                    if start is None:
-                        start = (i,j)
-                    elif end is None:
-                        end =(i,j)
-                        algo = dijkstra(maze, start, end)
-            
-        if event.type == pygame.QUIT:
-            running = False
-            
-    #ejecutar dijkstra paso a paso
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if btn_start.collidepoint(pygame.mouse.get_pos()):
+                    estado = "algoritmo"
+
+        elif estado == "algoritmo":
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x,y = pygame.mouse.get_pos()
+                i, j = y//cell, x // cell
+                
+                if 0 <= i < n and 0 <= j < n:
+                    if maze[i][j] == 0:
+                        if start is None:
+                            start = (i,j)
+                        elif end is None:
+                            end =(i,j)
+                            algo = dijkstra(maze, start, end)
+
     if algo:
         try:
             visited, result = next(algo)
@@ -170,9 +152,32 @@ while running:
                 algo = None
         except StopIteration:
             algo = None
-            
-    if estado == "algoritmo":
-    
+
+    if estado == "menu":
+
+        screen.fill((20,30,80))
+
+        title = font_title.render("LOGIN", True, (255,255,255))
+        screen.blit(title, (240,150))
+
+        sub = font_small.render("Welcome", True, (200,200,255))
+        screen.blit(sub, (250,190))
+
+        input_box = pygame.Rect(150, 250, 300, 50)
+        pygame.draw.rect(screen, (255,255,255), input_box, border_radius=15)
+
+        text = font_small.render(nombre, True, (0,0,0))
+        screen.blit(text, (160, 265))
+
+        pygame.draw.rect(screen, (255,105,180), btn_start, border_radius=20)
+
+        txt_btn = font_small.render("START MAZE", True, (255,255,255))
+        screen.blit(txt_btn, (225, 345))
+
+    elif estado == "algoritmo":
+
+        screen.fill(bg_soft)
+
         #Aqui dibujo el maze:
         for i in range(n):
             for j in range(n):
@@ -182,20 +187,20 @@ while running:
                     color = path_color
                 pygame.draw.rect(screen, color, (j*cell, i*cell, cell, cell))
 
-    #dibujar visited
-    for (i,j) in visited:
-        pygame.draw.rect(screen, visited_color, (j*cell, i*cell, cell, cell))
+        #dibujar visited
+        for (i,j) in visited:
+            pygame.draw.rect(screen, visited_color, (j*cell, i*cell, cell, cell))
 
-    #dibujar path
-    if path:
-        for (i,j) in path:
-            pygame.draw.rect(screen, final_path, (j*cell, i*cell, cell, cell))
+        #dibujar path
+        if path:
+            for (i,j) in path:
+                pygame.draw.rect(screen, final_path, (j*cell, i*cell, cell, cell))
 
-    #dibujar start y end (FUERA del loop)
-    if start:
-        pygame.draw.rect(screen, start_color, (start[1]*cell, start[0]*cell, cell,cell))
-    if end:
-        pygame.draw.rect(screen, end_color, (end[1]*cell, end[0]*cell, cell, cell))
+        #dibujar start y end (FUERA del loop)
+        if start:
+            pygame.draw.rect(screen, start_color, (start[1]*cell, start[0]*cell, cell,cell))
+        if end:
+            pygame.draw.rect(screen, end_color, (end[1]*cell, end[0]*cell, cell, cell))
                     
     pygame.display.flip()
     clock.tick(60)

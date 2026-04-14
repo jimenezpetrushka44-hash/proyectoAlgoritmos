@@ -206,7 +206,7 @@ while running:
             for (i,j) in path:
                 pygame.draw.rect(screen, final_path, (j*cell, i*cell, cell, cell))
 
-        #dibujar start y end (FUERA del loop)
+        #dibujar start y end:
         if start:
             pygame.draw.rect(screen, start_color, (start[1]*cell, start[0]*cell, cell,cell))
         if end:

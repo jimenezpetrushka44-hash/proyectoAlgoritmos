@@ -13,7 +13,7 @@ cell = width // n
 btn_start = pygame.Rect(200, 330, 200, 50)
 btn_retry = pygame.Rect(20, 550, 150, 40)
 
-#paleta de colores para que se vea bonito
+#paleta de colores para que se vea bonito jiji
 
 bg_soft        = (255, 240, 245)
 

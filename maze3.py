@@ -22,6 +22,9 @@ btn_details = pygame.Rect(400, 550, 150, 40) #boton para mostrar detalles del al
 btn_pause = pygame.Rect(190, 550, 90, 40)
 btn_speed = pygame.Rect(295, 550, 90, 40)
 
+#Nuevo boton para activar/desactivar movimiento diagonal
+btn_diagonal = pygame.Rect(215, 505, 170, 35)
+
 start_time = None #iniciando el contador de tiempo
 end_time = None #finalizando el contador de tiempo
 execution_time = None #variable para guardar el tiempo de ejecucion
@@ -33,6 +36,9 @@ velocidades = [1, 3, 7, 15]
 indice_velocidad = 1
 peso_inicial = 0
 peso_final = None
+
+#Variable para controlar si Dijkstra busca tambien en diagonal
+buscar_diagonal = False
 
 #paleta de colores para que se vea bonito jiji
 
@@ -78,12 +84,19 @@ generar(1,1)
 
 
 #Funcion para dijkstra:
-def dijkstra(maze, start, end):
+def dijkstra(maze, start, end, diagonal=False):
     n = len(maze)
     pq = [(0, start)]
     dist = {start: 0}
     prev = {}
     visited = set()
+
+    #Movimientos normales: arriba, abajo, izquierda, derecha
+    movimientos = [(-1,0), (1,0), (0,-1), (0,1)]
+
+    #Si diagonal esta activado, tambien se agregan las 4 diagonales
+    if diagonal:
+        movimientos += [(-1,-1), (-1,1), (1,-1), (1,1)]
 
     while pq:
         d, (x,y) = heapq.heappop(pq)
@@ -98,10 +111,20 @@ def dijkstra(maze, start, end):
         if (x,y) == end:
             break
 
-        for dx, dy in [(-1,0), (1,0), (0,-1), (0,1)]:
+        for dx, dy in movimientos:
             nx, ny = x+dx, y+dy
+
             if 0 <= nx < n and 0 <= ny < n and maze[nx][ny] == 0:
-                new_d = d + 1
+
+                #Si el movimiento es diagonal, su peso es 1.4 aproximadamente
+                #Si es movimiento normal, su peso es 1
+                if dx != 0 and dy != 0:
+                    costo = 1.4
+                else:
+                    costo = 1
+
+                new_d = d + costo
+
                 if (nx,ny) not in dist or new_d < dist[(nx,ny)]:
                     dist[(nx,ny)] = new_d
                     prev[(nx,ny)] = (x,y)
@@ -214,6 +237,11 @@ while running:
                     if path:
                         mostrar_detalles = not mostrar_detalles
 
+                elif btn_diagonal.collidepoint(mouse_pos):
+                    #Solo se puede activar/desactivar antes de correr el algoritmo
+                    if not algo and path is None:
+                        buscar_diagonal = not buscar_diagonal
+
                 else:
                     #Evitar que el usuario haga click mientras Dijkstra corre
                     if not algo:
@@ -231,7 +259,7 @@ while running:
 
                                 elif end is None:
                                     end = (i,j)
-                                    algo = dijkstra(maze, start, end)
+                                    algo = dijkstra(maze, start, end, buscar_diagonal)
                                     start_time = time.perf_counter() #iniciando el tiempo de ejecucion del algoritmo
                                     pausado = False
                                     peso_inicial = 0
@@ -247,7 +275,12 @@ while running:
                     path = reconstruir(result, start, end)
                     end_time = time.perf_counter() #finalizando el tiempo de ejecucion del algoritmo
                     execution_time = end_time - start_time #calculando el tiempo de ejecucion del algoritmo
-                    peso_final = len(path) - 1
+
+                    if end in distancias:
+                        peso_final = round(distancias[end], 2)
+                    else:
+                        peso_final = len(path) - 1
+
                     algo = None
                     break
 
@@ -314,9 +347,14 @@ while running:
 
         dibujar_boton(btn_details, "DETAILS")
 
+        if buscar_diagonal:
+            dibujar_boton(btn_diagonal, "DIAGONAL: ON")
+        else:
+            dibujar_boton(btn_diagonal, "DIAGONAL: OFF")
+
         if mostrar_detalles and path:
-            pygame.draw.rect(screen, (255,255,255), (20, 20, 390, 170), border_radius=15)
-            pygame.draw.rect(screen, (255,105,180), (20, 20, 390, 170), 3, border_radius=15)
+            pygame.draw.rect(screen, (255,255,255), (20, 20, 390, 195), border_radius=15)
+            pygame.draw.rect(screen, (255,105,180), (20, 20, 390, 195), 3, border_radius=15)
 
             info1 = font_mini.render(f"Tiempo: {execution_time:.5f}s", True, (0,0,0))
             info2 = font_mini.render(f"Distancia: {len(path)-1}", True, (0,0,0))
@@ -325,6 +363,7 @@ while running:
             info5 = font_mini.render(f"Final: {end}", True, (0,0,0))
             info6 = font_mini.render(f"Peso inicial: {peso_inicial}", True, (0,0,0))
             info7 = font_mini.render(f"Peso final: {peso_final}", True, (0,0,0))
+            info8 = font_mini.render(f"Diagonal: {'Activada' if buscar_diagonal else 'Desactivada'}", True, (0,0,0))
 
             screen.blit(info1, (35, 35))
             screen.blit(info2, (35, 58))
@@ -333,6 +372,7 @@ while running:
             screen.blit(info5, (35, 127))
             screen.blit(info6, (35, 150))
             screen.blit(info7, (35, 173))
+            screen.blit(info8, (35, 196))
 
     pygame.display.flip()
     clock.tick(60)

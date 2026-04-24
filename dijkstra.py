@@ -69,7 +69,6 @@ def main():
         end= (4,2)
         
         path = obj_maze.run(start,end)
-        
         print(f"La ruta mas eficiente segun el algoritmo de Dijkstra es: {path}")
         
         

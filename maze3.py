@@ -4,14 +4,24 @@ import pygame
 import numpy as np
 import random
 import heapq
+import time #importe esta libreria para medir el tiempo de ejecucion del algoritmo
 
 #Iniciando valores para el maze:
 width = 600
 height = 600
 n = 51
 cell = width // n
+
+pygame.init() #Iniciando pygame
+
 btn_start = pygame.Rect(200, 330, 200, 50)
 btn_retry = pygame.Rect(20, 550, 150, 40)
+btn_details = pygame.Rect(400, 550, 150, 40) #boton para mostrar detalles del algoritmo
+
+start_time = None #iniciando el contador de tiempo
+end_time = None #finalizando el contador de tiempo
+execution_time = None #variable para guardar el tiempo de ejecucion
+mostrar_detalles = False #variable para controlar si se muestran los detalles del algoritmo o no
 
 #paleta de colores para que se vea bonito jiji
 
@@ -24,9 +34,7 @@ visited_color  = (255, 182, 193)
 final_path     = (255, 20, 147)
 
 start_color    = (255, 105, 180)
-end_color      = (199, 21, 133)
-
-pygame.init() #Iniciando pygame
+end_color      = (0, 255, 0)
 
 #Variables para implementar mi menu:
 estado = "menu"
@@ -142,6 +150,15 @@ while running:
                     visited = set()
                     path = None
                     algo = None
+                    start_time = None
+                    end_time = None
+                    execution_time = None
+                    mostrar_detalles = False
+
+                elif btn_details.collidepoint(pygame.mouse.get_pos()):
+                    if path:
+                        mostrar_detalles = not mostrar_detalles
+
                 else:
                     x,y = pygame.mouse.get_pos()
                     i, j = y//cell, x // cell
@@ -153,12 +170,15 @@ while running:
                             elif end is None:
                                 end =(i,j)
                                 algo = dijkstra(maze, start, end)
+                                start_time = time.perf_counter() #iniciando el tiempo de ejecucion del algoritmo
 
     if algo:
         try:
             visited, result = next(algo)
             if result:
                 path = reconstruir(result, start, end)
+                end_time = time.perf_counter() #finalizando el tiempo de ejecucion del algoritmo
+                execution_time = end_time - start_time #calculando el tiempo de ejecucion del algoritmo
                 algo = None
         except StopIteration:
             algo = None
@@ -215,6 +235,22 @@ while running:
         pygame.draw.rect(screen, (255,105,180), btn_retry, border_radius=10)
         txt_retry = font_small.render("TRY AGAIN", True, (255,255,255))
         screen.blit(txt_retry, (30, 560))
+
+        pygame.draw.rect(screen, (255,105,180), btn_details, border_radius=10)
+        txt_details = font_small.render("SHOW DETAILS", True, (255,255,255))
+        screen.blit(txt_details, (410, 560))
+
+        if mostrar_detalles and path:
+            pygame.draw.rect(screen, (255,255,255), (20, 20, 360, 120), border_radius=15)
+            pygame.draw.rect(screen, (255,105,180), (20, 20, 360, 120), 3, border_radius=15)
+
+            info1 = font_small.render(f"Tiempo: {execution_time:.5f}s", True, (0,0,0))
+            info2 = font_small.render(f"Distancia: {len(path)-1}", True, (0,0,0))
+            info3 = font_small.render(f"Nodos visitados: {len(visited)}", True, (0,0,0))
+
+            screen.blit(info1, (35, 35))
+            screen.blit(info2, (35, 70))
+            screen.blit(info3, (35, 105))
                     
     pygame.display.flip()
     clock.tick(60)
